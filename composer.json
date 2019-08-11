@@ -1,0 +1,21 @@
+{
+  "name": "crawly/captcha-breaker",
+  "description": "A library meant to assist with breaking captchas, using various providers",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Naroga",
+      "email": "naroga@crawly.com.br"
+    }
+  ],
+  "require": {
+    "php": ">=7.2",
+    "ext-curl": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Crawly\\CaptchaBreaker\\": "src/"
+    }
+  }
+}
