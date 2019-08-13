@@ -14,9 +14,9 @@ use Crawly\CaptchaBreaker\Provider\ProviderInterface;
  *
  * Class that manages all NoCaptcha challenges.
  */
-class NoCaptcha extends Anticaptcha implements ProviderInterface
+class NoCaptcha extends AntiCaptcha implements ProviderInterface
 {
-    protected $websiteUrl;
+    protected $websiteURL;
     protected $websiteKey;
     protected $websiteSToken;
     protected $proxyType = "http";
@@ -30,8 +30,8 @@ class NoCaptcha extends Anticaptcha implements ProviderInterface
     protected function getPostData()
     {
         return array(
-            "type" => "NoCaptchaTask",
-            "websiteURL" => $this->websiteUrl,
+            "type" => empty($this->proxyAddress) ? "NoCaptchaTaskProxyless" : "NoCaptchaTask",
+            "websiteURL" => $this->websiteURL,
             "websiteKey" => $this->websiteKey,
             "websiteSToken" => $this->websiteSToken,
             "proxyType" => $this->proxyType,
@@ -55,10 +55,12 @@ class NoCaptcha extends Anticaptcha implements ProviderInterface
     public function solve(): string
     {
         if (!$this->createTask()) {
+            dump($this->getErrorMessage());
             throw new TaskCreationFailed($this->getErrorMessage());
         }
 
         if (!$this->waitForResult()) {
+            dump($this->getErrorMessage());
             throw new BreakFailedException($this->getErrorMessage());
         }
 
@@ -71,19 +73,20 @@ class NoCaptcha extends Anticaptcha implements ProviderInterface
     public function setup(array $data): void
     {
         $requiredKeys = [
-            'websiteUrl',
+            'websiteURL',
             'websiteKey',
-            'websiteToken',
             'userAgent'
         ];
 
         $allowedKeys = [
+            'websiteToken',
             'proxyType',
             'proxyHost',
             'proxyPort',
             'proxyLogin',
             'proxyPassword',
-            'cookies'
+            'cookies',
+            'invisible'
         ];
 
         $illegalKeys = array_intersect($requiredKeys, $allowedKeys, array_keys($data));

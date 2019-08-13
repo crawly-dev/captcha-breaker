@@ -4,11 +4,13 @@ namespace Crawly\CaptchaBreaker;
 
 use Crawly\CaptchaBreaker\Exception\InvalidProviderException;
 use Crawly\CaptchaBreaker\Provider\AntiCaptcha\NoCaptcha;
+use Crawly\CaptchaBreaker\Provider\AntiCaptcha\ReCaptchaV3;
 use Crawly\CaptchaBreaker\Provider\ProviderInterface;
 
 class CaptchaBreakerFactory
 {
     public const PROVIDER_ANTICAPTCHA_NOCAPTCHA = 'anticaptcha/nocaptcha';
+    public const PROVIDER_ANTICAPTCHA_RECAPTCHA_V3 = 'anticaptcha/recaptchav3';
 
     private $providers;
 
@@ -20,7 +22,10 @@ class CaptchaBreakerFactory
 
     private function setDefaultProviders()
     {
-        $this->providers =  [self::PROVIDER_ANTICAPTCHA_NOCAPTCHA => NoCaptcha::class];
+        $this->providers =  [
+            self::PROVIDER_ANTICAPTCHA_NOCAPTCHA => NoCaptcha::class,
+            self::PROVIDER_ANTICAPTCHA_RECAPTCHA_V3 => ReCaptchaV3::class,
+        ];
     }
 
     /**
@@ -36,5 +41,14 @@ class CaptchaBreakerFactory
         if (!isset($this->providers[$provider])) {
             throw new InvalidProviderException($provider);
         }
+
+        /** @var ProviderInterface $provider */
+        $providerObj = new $this->providers[$provider];
+
+        if (!empty($providerData)) {
+            $providerObj->setup($providerData);
+        }
+
+        return $providerObj;
     }
 }

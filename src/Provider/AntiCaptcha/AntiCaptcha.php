@@ -8,7 +8,7 @@ class AntiCaptcha
 {
     private $host = "api.anti-captcha.com";
     private $scheme = "https";
-    private $clientKey;
+    protected $clientKey;
     private $verboseMode = false;
     private $errorMessage;
     private $taskId;
